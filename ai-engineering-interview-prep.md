@@ -28,6 +28,72 @@
 
 ## 1. Foundations of Machine Learning
 
+
+> **🎯 FAANG Interview Tip — ML Foundations**
+> At Anthropic, OpenAI, and Google DeepMind, you'll be expected to go beyond textbook definitions. Explain bias-variance tradeoff with a *concrete example* (e.g., polynomial regression degree), derive gradient descent from first principles, and discuss when tree-based models beat neural nets (tabular data with <10K samples). Know the difference between L1 and L2 regularization geometrically (diamond vs circle constraint).
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  ML LEARNING PARADIGMS                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              SUPERVISED LEARNING                         │   │
+│  │  Input (X) + Label (Y) → Learn mapping f: X → Y         │   │
+│  │                                                          │   │
+│  │  Classification          Regression                      │   │
+│  │  ┌────────────┐         ┌────────────┐                   │   │
+│  │  │ Is this    │         │ What price │                   │   │
+│  │  │ spam? Y/N  │         │ will this  │                   │   │
+│  │  │            │         │ house sell │                   │   │
+│  │  └────────────┘         │ for? $$$   │                   │   │
+│  │                         └────────────┘                   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │            UNSUPERVISED LEARNING                         │   │
+│  │  Input (X) only → Find hidden structure                  │   │
+│  │                                                          │   │
+│  │  Clustering           Dimensionality Reduction           │   │
+│  │  ┌────────────┐      ┌────────────┐                      │   │
+│  │  │ Group users│      │ 1000 dims  │                      │   │
+│  │  │ by behavior│      │   → 50 dims│                      │   │
+│  │  └────────────┘      │ (PCA/t-SNE)│                      │   │
+│  │                      └────────────┘                      │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │          REINFORCEMENT LEARNING                          │   │
+│  │  Agent → Action → Environment → Reward → Learn           │   │
+│  │                                                          │   │
+│  │  ┌───────┐  action  ┌─────────────┐                      │   │
+│  │  │ Agent │─────────▶│ Environment │                      │   │
+│  │  │       │◀─────────│             │                      │   │
+│  │  └───────┘  reward  └─────────────┘                      │   │
+│  │            + state                                       │   │
+│  │  Used in: RLHF, game AI, robotics                        │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  BIAS-VARIANCE TRADEOFF                                         │
+│                                                                 │
+│  Error                                                          │
+│    │ ╲                    ╱                                      │
+│    │  ╲  Total Error    ╱                                       │
+│    │   ╲              ╱                                         │
+│    │    ╲    ╱──────╱                                           │
+│    │     ╲╱                 Variance ╱                          │
+│    │     ╱╲                        ╱                            │
+│    │   ╱   ╲──────────────╱                                     │
+│    │  Bias  ╲────────────────────                               │
+│    └──────────────────────────── Model Complexity               │
+│         Simple ◀──────────▶ Complex                             │
+│       (underfit)          (overfit)                              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
+
 ### What Is Machine Learning?
 
 Machine learning is teaching computers to learn patterns from data instead of programming explicit rules. Think of it like teaching a child to recognize dogs: you don't give them a rulebook listing every breed. Instead, you show them thousands of pictures, and they eventually learn to spot the pattern on their own.
@@ -154,7 +220,79 @@ print(f"Explained variance: {sum(pca.explained_variance_ratio_):.2%}")
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — ML Foundations</strong></summary>
+
+1. Explain the bias-variance tradeoff with a concrete example.
+2. What is the difference between L1 and L2 regularization? When would you choose each?
+3. How does gradient descent differ from stochastic gradient descent?
+4. When would you use a decision tree over a neural network?
+5. Explain precision, recall, and F1 score. When is each most important?
+6. What is cross-validation and why is it necessary?
+
+</details>
+
+> **📚 Deep Dive — Read More (ML Foundations)**
+> - [Machine Learning Crash Course — Google](https://developers.google.com/machine-learning/crash-course)
+> - [Bias-Variance Tradeoff Explained — MLU](https://mlu-explain.github.io/bias-variance/)
+> - [Feature Engineering Guide — Google](https://developers.google.com/machine-learning/data-prep)
+> - [Evaluation Metrics — scikit-learn Docs](https://scikit-learn.org/stable/modules/model_evaluation.html)
+
+
 ## 2. Deep Learning Fundamentals
+
+
+> **🎯 FAANG Interview Tip — Deep Learning**
+> Expect to derive backpropagation for a 2-layer network on a whiteboard. Know *why* ReLU is preferred over sigmoid (vanishing gradients), when to use BatchNorm vs LayerNorm (vision vs NLP), and the intuition behind Adam optimizer (momentum + adaptive learning rates). At Anthropic, you may be asked about scaling laws and why transformers scale better than RNNs.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              NEURAL NETWORK ARCHITECTURE                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Input Layer      Hidden Layers        Output Layer             │
+│                                                                 │
+│    x₁ ─────────┐                                                │
+│                 ├──▶ [h₁] ──┐                                   │
+│    x₂ ─────────┤            ├──▶ [h₃] ──┐                      │
+│                 ├──▶ [h₂] ──┤            ├──▶  ŷ               │
+│    x₃ ─────────┘            └──▶ [h₄] ──┘                      │
+│                                                                 │
+│    Each connection has a weight (w) and bias (b):               │
+│    h = activation(w·x + b)                                      │
+│                                                                 │
+│                                                                 │
+│   ACTIVATION FUNCTIONS COMPARED                                 │
+│   ┌──────────────┬──────────────┬─────────────────────────────┐ │
+│   │ Function     │ Range        │ When to Use                 │ │
+│   ├──────────────┼──────────────┼─────────────────────────────┤ │
+│   │ ReLU         │ [0, ∞)       │ Hidden layers (default)     │ │
+│   │ Sigmoid      │ (0, 1)       │ Binary output only          │ │
+│   │ Tanh         │ (-1, 1)      │ When centered output needed │ │
+│   │ GELU         │ ≈ smooth ReLU│ Transformers (GPT, BERT)    │ │
+│   │ SiLU/Swish   │ (-0.28, ∞)   │ Modern architectures        │ │
+│   │ Softmax      │ (0,1) sum=1  │ Multi-class output          │ │
+│   └──────────────┴──────────────┴─────────────────────────────┘ │
+│                                                                 │
+│                                                                 │
+│   BACKPROPAGATION (CHAIN RULE)                                  │
+│                                                                 │
+│   Forward:  x → [w₁] → h → [w₂] → ŷ → Loss(ŷ, y)            │
+│                                                                 │
+│   Backward: ∂Loss/∂w₁ = ∂Loss/∂ŷ · ∂ŷ/∂h · ∂h/∂w₁           │
+│             ◀──────── chain rule ────────▶                      │
+│                                                                 │
+│   Gradient descent: w ← w - α · ∂Loss/∂w                       │
+│                         ↑                                       │
+│                    learning rate                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### Neural Networks: The Building Blocks
 
@@ -296,7 +434,103 @@ RNNs process sequential data by maintaining a hidden state that carries informat
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — Deep Learning</strong></summary>
+
+1. Derive the backpropagation update rule for a single weight in a 2-layer network.
+2. Why does ReLU help with the vanishing gradient problem? What is "dying ReLU"?
+3. What is the difference between BatchNorm and LayerNorm? When do you use each?
+4. Explain the Adam optimizer — how does it combine momentum and RMSProp?
+5. What is the purpose of dropout? How does it work at training vs inference time?
+6. CNNs use convolutions for spatial features. Why don't we use them for language?
+
+</details>
+
+> **📚 Deep Dive — Read More (Deep Learning)**
+> - [Neural Networks and Deep Learning — Michael Nielsen](http://neuralnetworksanddeeplearning.com/)
+> - [CS231n: CNNs for Visual Recognition — Stanford](https://cs231n.github.io/)
+> - [The Matrix Calculus You Need for Deep Learning — explained.ai](https://explained.ai/matrix-calculus/)
+> - [Understanding LSTM Networks — Colah's Blog](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
+
 ## 3. The Transformer Architecture
+
+
+> **🎯 FAANG Interview Tip — Transformers**
+> This is THE most important topic for AI engineering interviews at Anthropic, OpenAI, and Google. You must be able to explain self-attention from scratch: Q, K, V matrices, scaled dot-product attention, why we divide by √d_k (prevents softmax saturation), and multi-head attention (parallel subspaces). Know the computational complexity O(n²·d) and why this motivates research into efficient attention (FlashAttention, ring attention, sliding window).
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│             THE TRANSFORMER BLOCK (DETAILED)                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Input Tokens: ["The", "cat", "sat"]                            │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────────────┐                                        │
+│  │ Token Embeddings    │  + Positional Encoding                 │
+│  │ (learned vectors)   │    (sinusoidal or learned)             │
+│  └────────┬────────────┘                                        │
+│           │                                                     │
+│           ▼                                                     │
+│  ╔═══════════════════════════════════════╗  ×N layers            │
+│  ║                                       ║                      │
+│  ║  ┌─────────────────────────────────┐  ║                      │
+│  ║  │    Multi-Head Self-Attention    │  ║                      │
+│  ║  │                                 │  ║                      │
+│  ║  │  Input X → Q = XW_Q            │  ║                      │
+│  ║  │           K = XW_K             │  ║                      │
+│  ║  │           V = XW_V             │  ║                      │
+│  ║  │                                 │  ║                      │
+│  ║  │  Attention = softmax(QK^T/√d_k)V│  ║                      │
+│  ║  │                                 │  ║                      │
+│  ║  │  h heads → concat → linear     │  ║                      │
+│  ║  └──────────────┬──────────────────┘  ║                      │
+│  ║       + Residual connection           ║                      │
+│  ║                 │                     ║                      │
+│  ║  ┌──────────────▼──────────────────┐  ║                      │
+│  ║  │       Layer Normalization       │  ║                      │
+│  ║  └──────────────┬──────────────────┘  ║                      │
+│  ║                 │                     ║                      │
+│  ║  ┌──────────────▼──────────────────┐  ║                      │
+│  ║  │    Feed-Forward Network (FFN)   │  ║                      │
+│  ║  │    Linear → GELU → Linear      │  ║                      │
+│  ║  │    (d_model → 4·d_model → d)   │  ║                      │
+│  ║  └──────────────┬──────────────────┘  ║                      │
+│  ║       + Residual connection           ║                      │
+│  ║                 │                     ║                      │
+│  ║  ┌──────────────▼──────────────────┐  ║                      │
+│  ║  │       Layer Normalization       │  ║                      │
+│  ║  └──────────────┬──────────────────┘  ║                      │
+│  ╚═════════════════╪═════════════════════╝                      │
+│                    │                                            │
+│                    ▼                                            │
+│            Output Embeddings                                    │
+│                                                                 │
+│                                                                 │
+│   WHY √d_k SCALING?                                             │
+│   ┌──────────────────────────────────────────────────────┐      │
+│   │ Without scaling: dot products grow with dimension    │      │
+│   │ → softmax saturates → near-zero gradients            │      │
+│   │ Dividing by √d_k keeps variance ≈ 1                  │      │
+│   └──────────────────────────────────────────────────────┘      │
+│                                                                 │
+│   ENCODER vs DECODER                                            │
+│   ┌────────────────────┬─────────────────────────────────┐      │
+│   │ Encoder            │ Decoder                         │      │
+│   ├────────────────────┼─────────────────────────────────┤      │
+│   │ Bidirectional attn │ Causal (masked) attention       │      │
+│   │ Sees all tokens    │ Only sees past tokens           │      │
+│   │ BERT, embeddings   │ GPT, Claude, text generation    │      │
+│   └────────────────────┴─────────────────────────────────┘      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### Why Transformers Changed Everything
 
@@ -411,7 +645,100 @@ Since transformers process all tokens simultaneously, they have no inherent sens
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — Transformers</strong></summary>
+
+1. Explain self-attention step by step: how are Q, K, V computed and used?
+2. Why do we scale by √d_k in the attention computation?
+3. What is multi-head attention and why is it better than single-head?
+4. What is the purpose of positional encoding? Name two approaches.
+5. What is the computational complexity of self-attention? Why is this a problem?
+6. Explain the difference between encoder-only (BERT), decoder-only (GPT), and encoder-decoder (T5).
+
+</details>
+
+> **🔥 Real-World Interview Scenario — Anthropic**
+> *"Explain how you would reduce the inference latency of a transformer model that currently takes 2 seconds per request, targeting <500ms."*
+>
+> **Answer:** Layer by layer: (1) **KV caching** — avoid recomputing past attention, (2) **Quantization** — INT8 or INT4 reduces memory bandwidth, (3) **FlashAttention** — fused CUDA kernel, IO-aware, (4) **Speculative decoding** — small model drafts, large model verifies, (5) **Batching** — continuous batching to maximize GPU utilization, (6) **Model distillation** — train smaller model to mimic larger one, (7) **Tensor parallelism** — split model across GPUs for single-request latency.
+
+> **📚 Deep Dive — Read More (Transformers)**
+> - [Attention Is All You Need — Original Paper](https://arxiv.org/abs/1706.03762)
+> - [The Illustrated Transformer — Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
+> - [FlashAttention Paper — Dao et al.](https://arxiv.org/abs/2205.14135)
+> - [The Annotated Transformer — Harvard NLP](https://nlp.seas.harvard.edu/annotated-transformer/)
+
+
 ## 4. Large Language Models (LLMs)
+
+
+> **🎯 FAANG Interview Tip — LLMs**
+> At Anthropic, you'll be asked about the full LLM inference pipeline: tokenization → embedding → forward pass through N transformer layers → logits → sampling strategy → token selection → append to context → repeat. Know KV cache (avoids recomputing attention for past tokens), context window limits (and why — quadratic attention cost), and temperature/top-p/top-k sampling tradeoffs.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                LLM TEXT GENERATION PIPELINE                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  "The cat"                                                      │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────┐    ┌─────────────┐    ┌──────────────────┐     │
+│  │ Tokenizer   │───▶│ Embedding   │───▶│ Transformer      │     │
+│  │ "The"→1234  │    │ lookup      │    │ Layers (×96)     │     │
+│  │ "cat"→5678  │    │ dim=4096    │    │                  │     │
+│  └─────────────┘    └─────────────┘    └────────┬─────────┘     │
+│                                                 │               │
+│                                                 ▼               │
+│                                        ┌──────────────────┐     │
+│                                        │ Logits (vocab    │     │
+│                                        │ size = 100K+)    │     │
+│                                        └────────┬─────────┘     │
+│                                                 │               │
+│                                                 ▼               │
+│                                        ┌──────────────────┐     │
+│                                        │ Sampling Strategy│     │
+│                                        │ temperature/top-p│     │
+│                                        └────────┬─────────┘     │
+│                                                 │               │
+│                                                 ▼               │
+│                                           "sat" (next token)    │
+│                                                 │               │
+│                              ┌──────────────────┘               │
+│                              ▼                                  │
+│                 Append to context, repeat                        │
+│                 ("The cat sat" → predict next)                  │
+│                                                                 │
+│                                                                 │
+│   SAMPLING STRATEGIES COMPARED                                  │
+│   ┌───────────────┬──────────────────────────────────────────┐  │
+│   │ Strategy      │ Effect                                   │  │
+│   ├───────────────┼──────────────────────────────────────────┤  │
+│   │ temperature=0 │ Always pick highest prob (deterministic) │  │
+│   │ temperature=1 │ Sample from full distribution            │  │
+│   │ temperature>1 │ Flatter distribution (more random)       │  │
+│   │ top-k=50      │ Sample from top 50 tokens only           │  │
+│   │ top-p=0.9     │ Sample from smallest set summing to 90%  │  │
+│   └───────────────┴──────────────────────────────────────────┘  │
+│                                                                 │
+│   KV CACHE — WHY IT MATTERS                                     │
+│   ┌──────────────────────────────────────────────────────────┐  │
+│   │ Without cache: recompute attention for ALL previous      │  │
+│   │ tokens at each step → O(n²) per token                    │  │
+│   │                                                          │  │
+│   │ With KV cache: store K,V from previous tokens,           │  │
+│   │ only compute new token's Q → O(n) per token              │  │
+│   │                                                          │  │
+│   │ Tradeoff: faster inference but uses more GPU memory      │  │
+│   └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### What Are LLMs?
 
@@ -493,6 +820,28 @@ Research has shown predictable relationships between model performance and:
 The key insight: you can predict how well a model will perform by knowing these three factors, which helps decide how to allocate resources.
 
 ---
+
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — LLMs</strong></summary>
+
+1. Explain the complete LLM inference pipeline from text input to generated token.
+2. What is the KV cache and why does it speed up inference?
+3. Compare temperature, top-k, and top-p sampling. When would you use each?
+4. What is the context window limitation and what causes it?
+5. Explain scaling laws — how do model performance, data size, and compute relate?
+6. What is the difference between autoregressive and masked language modeling?
+
+</details>
+
+> **📚 Deep Dive — Read More (LLMs)**
+> - [Scaling Laws for Neural Language Models — Kaplan et al.](https://arxiv.org/abs/2001.08361)
+> - [The Illustrated GPT-2 — Jay Alammar](https://jalammar.github.io/illustrated-gpt2/)
+> - [LLM Inference Optimization — Hugging Face](https://huggingface.co/docs/transformers/llm_tutorial_optimization)
+> - [Chinchilla Scaling Laws — Hoffmann et al.](https://arxiv.org/abs/2203.15556)
+
 
 ## 5. Tokenization and Embeddings
 
@@ -652,7 +1001,109 @@ response = client.chat.completions.create(
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — Tokenization & Embeddings + Prompt Engineering</strong></summary>
+
+1. How does BPE (Byte Pair Encoding) tokenization work? Walk through an example.
+2. What is the difference between word embeddings and contextual embeddings?
+3. How does cosine similarity measure semantic relatedness?
+4. Explain zero-shot, few-shot, and chain-of-thought prompting with examples.
+5. What are common prompt injection attacks and how do you defend against them?
+6. When would you use prompt engineering vs fine-tuning vs RAG?
+
+</details>
+
+> **📚 Deep Dive — Read More (Tokenization, Embeddings & Prompting)**
+> - [BPE Tokenization Explained — Hugging Face](https://huggingface.co/learn/nlp-course/chapter6/5)
+> - [Word2Vec Explained — Jay Alammar](https://jalammar.github.io/illustrated-word2vec/)
+> - [Prompt Engineering Guide — DAIR.AI](https://www.promptingguide.ai/)
+> - [Chain-of-Thought Prompting — Wei et al.](https://arxiv.org/abs/2201.11903)
+
+
 ## 7. Fine-Tuning and Alignment
+
+
+> **🎯 FAANG Interview Tip — Fine-Tuning & Alignment**
+> At Anthropic and OpenAI, alignment is a core interview topic. Know the difference between SFT (supervised fine-tuning), RLHF, and DPO. Be able to explain LoRA mathematically: instead of updating W (d×d), learn two low-rank matrices A (d×r) and B (r×d) where r << d, so W' = W + AB. This reduces trainable params from d² to 2dr. Also know Constitutional AI (Anthropic's approach) — self-supervised critique and revision.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              FINE-TUNING DECISION TREE                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Need to customize model behavior?                              │
+│       │                                                         │
+│       ├── Just need format/style changes?                       │
+│       │   └── ✅ Prompt Engineering (cheapest)                  │
+│       │                                                         │
+│       ├── Need domain knowledge not in training data?           │
+│       │   └── ✅ RAG (retrieval-augmented generation)           │
+│       │                                                         │
+│       ├── Need consistent behavior change with <1000 examples?  │
+│       │   └── ✅ LoRA / QLoRA fine-tuning                      │
+│       │                                                         │
+│       └── Need fundamental capability change with 10K+ examples?│
+│           └── ✅ Full fine-tuning (expensive)                   │
+│                                                                 │
+│                                                                 │
+│   LoRA (Low-Rank Adaptation)                                    │
+│                                                                 │
+│   Original weight matrix W (d × d):                             │
+│                                                                 │
+│   ┌─────────────────────┐                                       │
+│   │                     │  d² parameters                        │
+│   │     W (frozen)      │  e.g., 4096² = 16.7M                 │
+│   │                     │                                       │
+│   └─────────────────────┘                                       │
+│            +                                                    │
+│   ┌───┐   ┌───────────────────┐                                 │
+│   │   │   │                   │                                 │
+│   │ B │ × │        A          │  2 × d × r parameters           │
+│   │d×r│   │      r × d        │  e.g., 2 × 4096 × 16 = 131K   │
+│   │   │   │                   │                                 │
+│   └───┘   └───────────────────┘                                 │
+│                                                                 │
+│   W' = W + B·A    (only train B and A, freeze W)                │
+│   Reduction: 16.7M → 131K params (99.2% fewer!)                │
+│                                                                 │
+│                                                                 │
+│   ALIGNMENT TRAINING PIPELINE                                   │
+│                                                                 │
+│   ┌──────────────────┐                                          │
+│   │  Pre-trained LLM │  (raw next-token predictor)              │
+│   └────────┬─────────┘                                          │
+│            ▼                                                    │
+│   ┌──────────────────┐                                          │
+│   │  SFT (Supervised │  Instruction-response pairs              │
+│   │  Fine-Tuning)    │  "Follow instructions well"              │
+│   └────────┬─────────┘                                          │
+│            ▼                                                    │
+│   ┌──────────────────┐                                          │
+│   │  RLHF or DPO     │  Human preferences for alignment        │
+│   └────────┬─────────┘                                          │
+│            │                                                    │
+│    ┌───────┴────────┐                                           │
+│    ▼                ▼                                           │
+│  ┌──────┐     ┌──────────┐                                      │
+│  │ RLHF │     │   DPO    │                                      │
+│  │      │     │          │                                      │
+│  │Train │     │ Direct   │                                      │
+│  │reward│     │ optimize │                                      │
+│  │model │     │ on pref  │                                      │
+│  │then  │     │ pairs    │                                      │
+│  │PPO   │     │ (simpler)│                                      │
+│  └──────┘     └──────────┘                                      │
+│                                                                 │
+│  RLHF: Train reward model → use PPO to maximize reward          │
+│  DPO:  Skip reward model → optimize directly on preference pairs│
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### When to Fine-Tune vs. Prompt Engineer vs. RAG
 
@@ -728,7 +1179,111 @@ Fine-tuning a model on instruction-response pairs to make it better at following
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — Fine-Tuning & Alignment</strong></summary>
+
+1. When would you choose fine-tuning over RAG? Give two scenarios for each.
+2. Explain LoRA mathematically — what are the low-rank matrices and why does this work?
+3. What is QLoRA and how does it differ from LoRA?
+4. Compare RLHF and DPO — advantages and disadvantages of each.
+5. What is Constitutional AI? How does it differ from RLHF?
+6. Explain instruction tuning — why is it a critical step after pre-training?
+
+</details>
+
+> **🔥 Real-World Interview Scenario — OpenAI**
+> *"You need to make a model follow a specific output format (JSON with particular fields) consistently. What approach would you take?"*
+>
+> **Answer:** Start with **prompt engineering** — structured prompts with examples of the desired JSON format (few-shot). If consistency is <95%, try **function calling / structured outputs** (constrained decoding). If the format is complex and domain-specific, **LoRA fine-tuning** on 500-1000 examples of correct input→JSON pairs. Evaluate with automated parsing tests. Always prefer the simplest approach that meets reliability requirements.
+
+> **📚 Deep Dive — Read More (Fine-Tuning & Alignment)**
+> - [LoRA Paper — Hu et al.](https://arxiv.org/abs/2106.09685)
+> - [QLoRA Paper — Dettmers et al.](https://arxiv.org/abs/2305.14314)
+> - [DPO Paper — Rafailov et al.](https://arxiv.org/abs/2305.18290)
+> - [RLHF Explained — Hugging Face](https://huggingface.co/blog/rlhf)
+> - [Constitutional AI — Anthropic](https://arxiv.org/abs/2212.08073)
+
+
 ## 8. Retrieval-Augmented Generation (RAG)
+
+
+> **🎯 FAANG Interview Tip — RAG**
+> RAG is the most commonly asked system design topic for AI engineering roles. You must be able to design a complete RAG pipeline: document ingestion → chunking strategy → embedding → vector store → retrieval → re-ranking → prompt construction → generation → evaluation. Know failure modes (wrong chunks retrieved, lost in the middle, stale data) and advanced techniques (hybrid search, HyDE, multi-query, parent-child chunking).
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              RAG PIPELINE (DETAILED)                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ═══ INGESTION (offline) ═══                                    │
+│                                                                 │
+│  Documents ──▶ Chunking ──▶ Embedding ──▶ Vector DB             │
+│  (PDF,web,     (split by    (text→vec    (Pinecone,             │
+│   docs)        size/semantic) via model)  Weaviate)             │
+│                                                                 │
+│  Chunking Strategies:                                           │
+│  ┌────────────────────┬──────────────────────────────────┐      │
+│  │ Fixed-size         │ 512 tokens, 50 token overlap     │      │
+│  │ Semantic           │ Split at topic boundaries        │      │
+│  │ Parent-child       │ Small chunks for retrieval,      │      │
+│  │                    │ return parent for context         │      │
+│  │ Sentence-window    │ Retrieve sentence + neighbors    │      │
+│  └────────────────────┴──────────────────────────────────┘      │
+│                                                                 │
+│  ═══ RETRIEVAL + GENERATION (online) ═══                        │
+│                                                                 │
+│  User Query                                                     │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────┐                                                │
+│  │  Embed      │  Same model as ingestion                       │
+│  │  Query      │                                                │
+│  └──────┬──────┘                                                │
+│         │                                                       │
+│         ▼                                                       │
+│  ┌─────────────┐     ┌──────────────────┐                       │
+│  │  Vector DB  │────▶│  Top-K Chunks    │                       │
+│  │  Similarity │     │  (k=5 to 20)     │                       │
+│  │  Search     │     └────────┬─────────┘                       │
+│  └─────────────┘              │                                 │
+│                               ▼                                 │
+│                      ┌──────────────────┐                       │
+│                      │  Re-Ranker       │  (optional but        │
+│                      │  (cross-encoder) │   recommended)        │
+│                      └────────┬─────────┘                       │
+│                               │                                 │
+│                               ▼                                 │
+│                      ┌──────────────────┐                       │
+│                      │  Prompt Builder  │                       │
+│                      │  "Given context: │                       │
+│                      │  {chunks}        │                       │
+│                      │  Answer: {query}"│                       │
+│                      └────────┬─────────┘                       │
+│                               │                                 │
+│                               ▼                                 │
+│                      ┌──────────────────┐                       │
+│                      │  LLM Generation  │ ──▶  Answer           │
+│                      └──────────────────┘                       │
+│                                                                 │
+│                                                                 │
+│   COMMON RAG FAILURE MODES                                      │
+│   ┌────────────────────┬─────────────────────────────────┐      │
+│   │ Problem            │ Solution                        │      │
+│   ├────────────────────┼─────────────────────────────────┤      │
+│   │ Wrong chunks       │ Better chunking + re-ranking    │      │
+│   │ Lost in the middle │ Put key info at start/end       │      │
+│   │ Stale data         │ Incremental index updates       │      │
+│   │ No relevant docs   │ Fallback to "I don't know"      │      │
+│   │ Too many chunks    │ Summarize before prompting       │      │
+│   └────────────────────┴─────────────────────────────────┘      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### What Is RAG?
 
@@ -913,7 +1468,102 @@ print(results["documents"])  # Returns PTO and holiday docs, not database doc
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — RAG & Vector Databases</strong></summary>
+
+1. Draw a complete RAG pipeline from document ingestion to answer generation.
+2. What are four different chunking strategies? When would you use each?
+3. Compare HNSW and IVF-PQ for approximate nearest neighbor search.
+4. What is hybrid search and when is it better than pure vector search?
+5. Name three RAG failure modes and how to mitigate each.
+6. What is a re-ranker and why does it improve RAG quality?
+
+</details>
+
+> **📚 Deep Dive — Read More (RAG & Vector DBs)**
+> - [RAG Paper — Lewis et al.](https://arxiv.org/abs/2005.11401)
+> - [Pinecone Learning Center](https://www.pinecone.io/learn/)
+> - [Chunking Strategies — LangChain Blog](https://blog.langchain.dev/evaluating-rag-pipelines-with-ragas/)
+> - [HNSW Algorithm Explained — Pinecone](https://www.pinecone.io/learn/series/faiss/hnsw/)
+> - [Advanced RAG Techniques — LlamaIndex](https://docs.llamaindex.ai/en/stable/optimizing/advanced_retrieval/)
+
+
 ## 10. AI Agents and Agentic Systems
+
+
+> **🎯 FAANG Interview Tip — AI Agents**
+> Agent architecture is a hot interview topic at Anthropic, OpenAI, and Google. You must understand the ReAct loop (Reason → Act → Observe), function calling (structured tool use), memory management (conversation history vs long-term storage), and multi-agent orchestration. Be ready to design an agent system for a given task: what tools does it need, how does it decide which to use, how do you handle errors and loops?
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              AI AGENT ARCHITECTURE                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   THE AGENT LOOP (ReAct Pattern)                                │
+│                                                                 │
+│   User Task: "Find the weather in Tokyo and book a restaurant"  │
+│        │                                                        │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │ REASON   │  "I need to: 1) check weather, 2) find          │
+│   │ (Think)  │   restaurants, 3) make reservation"              │
+│   └────┬─────┘                                                  │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │  ACT     │  Call weather_api("Tokyo")                       │
+│   │ (Tool)   │                                                  │
+│   └────┬─────┘                                                  │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │ OBSERVE  │  "Tokyo: 22°C, sunny"                            │
+│   │ (Result) │                                                  │
+│   └────┬─────┘                                                  │
+│        │                                                        │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │ REASON   │  "Weather is nice, outdoor dining possible.      │
+│   │          │   Search for outdoor restaurants."                │
+│   └────┬─────┘                                                  │
+│        ▼                                                        │
+│   ┌──────────┐                                                  │
+│   │  ACT     │  Call restaurant_search("Tokyo", "outdoor")      │
+│   └────┬─────┘                                                  │
+│        ▼                                                        │
+│      ... (loop continues until task complete)                   │
+│                                                                 │
+│                                                                 │
+│   MULTI-AGENT SYSTEM                                            │
+│                                                                 │
+│   ┌──────────────┐                                              │
+│   │ Orchestrator │  (plans, delegates, synthesizes)             │
+│   └──────┬───────┘                                              │
+│          │                                                      │
+│   ┌──────┼──────────────────────┐                               │
+│   ▼      ▼                     ▼                                │
+│  ┌────┐ ┌─────────┐     ┌──────────┐                            │
+│  │Code│ │Research │     │  Review   │                            │
+│  │Agent│ │Agent    │     │  Agent   │                            │
+│  │    │ │         │     │          │                             │
+│  │IDE,│ │Web,     │     │Verify,  │                             │
+│  │Git │ │Search,  │     │test,    │                             │
+│  │    │ │Read     │     │validate │                             │
+│  └────┘ └─────────┘     └──────────┘                            │
+│                                                                 │
+│   AGENT MEMORY TYPES                                            │
+│   ┌──────────────┬────────────────────────────────────────┐     │
+│   │ Short-term   │ Current conversation / scratchpad      │     │
+│   │ Long-term    │ Vector DB of past interactions         │     │
+│   │ Episodic     │ Specific past experiences              │     │
+│   │ Procedural   │ Learned workflows / tool usage         │     │
+│   └──────────────┴────────────────────────────────────────┘     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### What Are AI Agents?
 
@@ -1113,7 +1763,79 @@ def send_email(to: str, subject: str, body: str) -> bool:
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — AI Agents & Frameworks</strong></summary>
+
+1. Explain the ReAct pattern with a concrete example.
+2. How does function calling work in modern LLMs?
+3. What are the four types of agent memory? Give an example of each.
+4. How would you design a multi-agent system for code review?
+5. What is MCP (Model Context Protocol) and why was it created?
+6. Compare LangChain and LangGraph — when would you choose each?
+
+</details>
+
+> **📚 Deep Dive — Read More (Agents & Frameworks)**
+> - [ReAct Paper — Yao et al.](https://arxiv.org/abs/2210.03629)
+> - [LangChain Documentation](https://python.langchain.com/docs/get_started/introduction)
+> - [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
+> - [MCP Specification — Anthropic](https://modelcontextprotocol.io/)
+> - [Function Calling Guide — OpenAI](https://platform.openai.com/docs/guides/function-calling)
+
+
 ## 12. MLOps and Production Deployment
+
+
+> **🎯 FAANG Interview Tip — MLOps**
+> Production ML is what separates research engineers from production engineers. At every top AI company, you'll be asked about model versioning, A/B testing, monitoring for data drift, and rollback strategies. Know the difference between batch and online inference, when to use model distillation (smaller model mimics larger one for latency), and how to design a CI/CD pipeline for ML models.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              ML PRODUCTION PIPELINE                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐    │
+│  │  Data    │──▶│  Train   │──▶│ Evaluate │──▶│  Deploy  │    │
+│  │  Prep    │   │  Model   │   │  & Test  │   │  & Serve │    │
+│  └──────────┘   └──────────┘   └──────────┘   └──────────┘    │
+│       │              │              │              │            │
+│       │              │              │              │            │
+│       ▼              ▼              ▼              ▼            │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              MONITORING & FEEDBACK                       │   │
+│  │  Data drift │ Model performance │ Latency │ Cost         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│                                                                 │
+│   MODEL SERVING PATTERNS                                        │
+│   ┌────────────────┬──────────────────────────────────────────┐ │
+│   │ Pattern        │ When to Use                              │ │
+│   ├────────────────┼──────────────────────────────────────────┤ │
+│   │ Online (API)   │ Real-time: chatbots, search, rec systems│ │
+│   │ Batch          │ Scheduled: reports, bulk scoring         │ │
+│   │ Streaming      │ Continuous: fraud detection, monitoring  │ │
+│   │ Edge           │ On-device: mobile, IoT, low latency     │ │
+│   └────────────────┴──────────────────────────────────────────┘ │
+│                                                                 │
+│   KEY TOOLS IN THE ML STACK                                     │
+│   ┌─────────────────┬────────────────────────────────────────┐  │
+│   │ Category        │ Tools                                  │  │
+│   ├─────────────────┼────────────────────────────────────────┤  │
+│   │ Experiment      │ MLflow, Weights & Biases, Neptune      │  │
+│   │ Orchestration   │ Airflow, Kubeflow, Prefect             │  │
+│   │ Serving         │ vLLM, TGI, Triton, TorchServe          │  │
+│   │ Monitoring      │ Evidently, WhyLabs, Arize              │  │
+│   │ Feature Store   │ Feast, Tecton                          │  │
+│   │ Versioning      │ DVC, MLflow Model Registry             │  │
+│   └─────────────────┴────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### The ML Lifecycle
 
@@ -1277,7 +1999,98 @@ def check_output(response: str) -> str:
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — MLOps, Evaluation & Safety</strong></summary>
+
+1. What is the ML lifecycle and what are the key stages?
+2. Compare online vs batch vs streaming inference — give a use case for each.
+3. How do you detect data drift in production? What metrics do you monitor?
+4. What is model distillation and when would you use it?
+5. Explain prompt injection attacks and three defense strategies.
+6. What is Constitutional AI and how does it differ from content filtering?
+7. How do you set up A/B testing for ML models?
+
+</details>
+
+> **📚 Deep Dive — Read More (MLOps, Evaluation & Safety)**
+> - [MLOps Guide — Google Cloud](https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning)
+> - [ML System Design — Chip Huyen](https://huyenchip.com/machine-learning-systems-design/toc.html)
+> - [LLM Evaluation — Hugging Face](https://huggingface.co/docs/evaluate/index)
+> - [AI Safety — Anthropic Research](https://www.anthropic.com/research)
+> - [Prompt Injection Overview — Simon Willison](https://simonwillison.net/2023/Apr/14/worst-that-can-happen/)
+
+
 ## 15. System Design for AI Applications
+
+
+> **🎯 FAANG Interview Tip — AI System Design**
+> At Anthropic, Google, and Meta, the AI system design interview is often the hardest round. Use the template: (1) Clarify requirements and constraints, (2) High-level architecture, (3) Data pipeline, (4) Model selection and serving, (5) Scaling and cost, (6) Monitoring and iteration. Always discuss tradeoffs: latency vs accuracy, cost vs quality, batch vs real-time.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│         AI SYSTEM DESIGN TEMPLATE                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Step 1: CLARIFY                                                │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ • What is the input/output?                              │   │
+│  │ • QPS / latency requirements?                            │   │
+│  │ • Accuracy vs speed tradeoff?                            │   │
+│  │ • Budget / infrastructure constraints?                   │   │
+│  │ • Online vs batch vs streaming?                          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  Step 2: HIGH-LEVEL ARCHITECTURE                                │
+│                                                                 │
+│  Client ──▶ API Gateway ──▶ Inference Service ──▶ Response      │
+│                  │                   │                           │
+│                  ▼                   ▼                           │
+│            Rate Limiter       Model Server                      │
+│            Auth                (GPU cluster)                    │
+│                                     │                           │
+│                               ┌─────┴─────┐                    │
+│                               ▼           ▼                     │
+│                          Vector DB    Feature Store              │
+│                          (for RAG)   (for ML features)          │
+│                                                                 │
+│  Step 3: DATA PIPELINE                                          │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ Sources → ETL → Feature Store → Training Data            │   │
+│  │                              → Serving Features           │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  Step 4: MODEL SELECTION                                        │
+│  ┌──────────────┬────────────────────────────────────────┐      │
+│  │ Approach     │ When                                   │      │
+│  ├──────────────┼────────────────────────────────────────┤      │
+│  │ API (GPT/    │ Fastest to ship, highest per-token cost│      │
+│  │  Claude)     │                                        │      │
+│  │ Fine-tuned   │ Domain-specific, moderate cost         │      │
+│  │  open-source │                                        │      │
+│  │ Distilled    │ High throughput, lowest latency        │      │
+│  │  small model │                                        │      │
+│  │ Ensemble     │ Highest accuracy, highest cost         │      │
+│  └──────────────┴────────────────────────────────────────┘      │
+│                                                                 │
+│  Step 5: SCALING                                                │
+│  • Horizontal: multiple replicas behind load balancer           │
+│  • Batching: group requests for GPU efficiency                  │
+│  • Caching: semantic cache for similar queries                  │
+│  • Quantization: INT8/INT4 for faster inference                 │
+│                                                                 │
+│  Step 6: MONITORING                                             │
+│  • Model metrics: accuracy, latency p50/p95/p99                 │
+│  • Business metrics: user satisfaction, task completion         │
+│  • Data drift: input distribution changes                       │
+│  • Cost tracking: tokens/day, GPU utilization                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+
 
 ### Common AI System Design Questions
 
@@ -1341,6 +2154,37 @@ For any AI system design question, structure your answer:
 
 ---
 
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — AI System Design</strong></summary>
+
+1. Walk through designing a real-time recommendation system using LLMs.
+2. How would you design a RAG-based customer support chatbot for 10K concurrent users?
+3. What are the key tradeoffs between using an API-based LLM vs self-hosted?
+4. How do you handle model versioning and rollback in production?
+5. Design a content moderation system — what components are needed?
+
+</details>
+
+> **🔥 Real-World Interview Scenario — Google**
+> *"Design a semantic search system for a 10M document corpus that returns results in <200ms with 95th percentile accuracy."*
+>
+> **Answer:**
+> 1. **Ingestion**: Chunk documents (512 tokens, 50 overlap) → embed with a bi-encoder (e5-large) → store in HNSW index (Qdrant/Weaviate)
+> 2. **Query path**: Embed query → ANN search (top-100) → cross-encoder re-rank (top-10) → return
+> 3. **Latency budget**: Embedding (20ms) + ANN search (5ms) + re-rank (100ms) + overhead (50ms) = ~175ms
+> 4. **Scaling**: Shard index across nodes, replicate for read throughput, use GPU for re-ranking
+> 5. **Monitoring**: Track recall@10, latency p95, index freshness, query volume
+> 6. **Optimization**: Quantize embeddings (float32→int8), use product quantization for memory, cache frequent queries
+
+> **📚 Deep Dive — Read More (AI System Design)**
+> - [Designing Machine Learning Systems — Chip Huyen (book)](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/)
+> - [System Design for ML — Stanford CS329S](https://stanford-cs329s.github.io/)
+> - [LLM Cost Calculator](https://huggingface.co/spaces/philschmid/llm-pricing)
+
+
 ## 16. Cost and Latency Optimization
 
 ### Token Cost Reduction
@@ -1383,6 +2227,27 @@ With model tiering (80% to a $0.15/$0.60 model):
 ```
 
 ---
+
+
+---
+
+<details>
+<summary><strong>✅ Check Yourself — Cost & Latency Optimization</strong></summary>
+
+1. List five strategies to reduce LLM inference cost.
+2. What is speculative decoding and how does it reduce latency?
+3. How does quantization (INT8, INT4) affect model quality vs speed?
+4. What is continuous batching and why is it better than static batching?
+5. Calculate the approximate cost of serving 1M requests/day with GPT-4 vs a fine-tuned Llama 3.
+
+</details>
+
+> **📚 Deep Dive — Read More (Optimization)**
+> - [vLLM: Fast LLM Serving](https://docs.vllm.ai/)
+> - [Quantization Guide — Hugging Face](https://huggingface.co/docs/transformers/main/en/quantization)
+> - [Speculative Decoding — Leviathan et al.](https://arxiv.org/abs/2211.17192)
+> - [LLM Inference Performance Engineering — Anyscale](https://www.anyscale.com/blog/continuous-batching-llm-inference)
+
 
 ## 17. Quiz: 100+ Questions
 
